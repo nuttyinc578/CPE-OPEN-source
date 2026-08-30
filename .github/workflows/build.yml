@@ -1,0 +1,120 @@
+name: CPE open-source build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    name: Build and test CPE for Windows
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: cpe/go-cache/go.mod
+          cache-dependency-path: cpe/go-cache/go.mod
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install Python dependencies
+        run: python -m pip install --upgrade pip setuptools wheel pyinstaller && python -m pip install -r requirements.txt
+
+      - name: Test Python engine and Node integration
+        env:
+          SDL_VIDEODRIVER: dummy
+        run: python -m unittest discover -s cpe/tests -v
+
+      - name: Test Node.js bridge
+        run: node --test cpe/node-bridge/test/server.test.js
+
+      - name: Test and build Go cache
+        working-directory: cpe/go-cache
+        shell: pwsh
+        run: |
+          go test -v ./...
+          New-Item -ItemType Directory -Path bin -Force | Out-Null
+          go build -trimpath -o bin/cpe-go-cache.exe .
+
+      - name: Build Java client
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path cpe/java-client/out -Force | Out-Null
+          javac -d cpe/java-client/out cpe/java-client/src/main/java/com/nuttyinc/cpe/CpeClient.java
+
+      - name: Build .NET Aspire host
+        run: dotnet build cpe/CPE.AppHost/CPE.AppHost.csproj --configuration Release
+
+      - name: Build standalone CPE executable
+        run: python -m PyInstaller --noconfirm --clean --onefile --name CPE CPE.py
+
+      - name: Prepare downloadable package
+        shell: pwsh
+        run: |
+          $releasePath = "release/CPE-Windows"
+          New-Item -ItemType Directory -Path "$releasePath/cpe/tests" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$releasePath/cpe/node-bridge/test" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$releasePath/cpe/go-cache/bin" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$releasePath/cpe/java-client/src/main/java/com/nuttyinc/cpe" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$releasePath/cpe/java-client/out/com/nuttyinc/cpe" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$releasePath/cpe/CPE.AppHost/Properties" -Force | Out-Null
+          Copy-Item dist/CPE.exe "$releasePath/CPE.exe"
+          Copy-Item CPE.py, LICENSE, README.md, requirements.txt, pyproject.toml, THIRD_PARTY_NOTICES.md "$releasePath/"
+          Copy-Item "Run CPE Aspire.cmd", "Run CPE Java Client.cmd", "Run CPE Offline.cmd" "$releasePath/"
+          Copy-Item cpe/*.py "$releasePath/cpe/"
+          Copy-Item cpe/tests/*.py "$releasePath/cpe/tests/"
+          Copy-Item cpe/node-bridge/server.js, cpe/node-bridge/package.json "$releasePath/cpe/node-bridge/"
+          Copy-Item cpe/node-bridge/test/server.test.js "$releasePath/cpe/node-bridge/test/"
+          Copy-Item cpe/go-cache/main.go, cpe/go-cache/main_test.go, cpe/go-cache/go.mod "$releasePath/cpe/go-cache/"
+          Copy-Item cpe/go-cache/bin/cpe-go-cache.exe "$releasePath/cpe/go-cache/bin/"
+          Copy-Item cpe/java-client/README.md "$releasePath/cpe/java-client/"
+          Copy-Item cpe/java-client/src/main/java/com/nuttyinc/cpe/CpeClient.java "$releasePath/cpe/java-client/src/main/java/com/nuttyinc/cpe/"
+          Copy-Item cpe/java-client/out/com/nuttyinc/cpe/CpeClient.class "$releasePath/cpe/java-client/out/com/nuttyinc/cpe/"
+          Copy-Item cpe/CPE.AppHost/CPE.AppHost.csproj, cpe/CPE.AppHost/Program.cs "$releasePath/cpe/CPE.AppHost/"
+          Copy-Item cpe/CPE.AppHost/Properties/launchSettings.json "$releasePath/cpe/CPE.AppHost/Properties/"
+
+      - name: Upload CPE-Windows artifact
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: CPE-Windows
+          path: release/CPE-Windows
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+
+      - name: Add nightly.link URL to summary
+        shell: pwsh
+        run: |
+          "## CPE Windows download" >> $env:GITHUB_STEP_SUMMARY
+          "https://nightly.link/nuttyinc578/CPE-OPEN-source/workflows/build/main/CPE-Windows.zip" >> $env:GITHUB_STEP_SUMMARY

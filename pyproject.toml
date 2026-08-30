@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nuttyinc-cpe"
+version = "0.1.0"
+description = "Cube Physics Engine with the Integrated Particle Engine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [
+  { name = "nutty'inc" }
+]
+dependencies = [
+  "pygame==2.6.1",
+  "pymunk==7.3.0"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Games/Entertainment"
+]
+
+[project.scripts]
+cpe = "cpe.demo:main"
+
+[tool.setuptools.packages.find]
+include = ["cpe*"]
+exclude = ["cpe.tests*"]
