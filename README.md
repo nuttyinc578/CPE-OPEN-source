@@ -11,7 +11,7 @@ The Integrated Particle Engine (IPE) is included in CPE.
 
 After the first successful `main` build, this permanent nightly.link URL downloads the newest `CPE-Windows` artifact:
 
-<https://nightly.link/nuttyinc578/CPE-OPEN-source/workflows/build/main/CPE-Windows.zip>
+(https://github.com/nuttyinc578/CPE-OPEN-source/releases)
 
 The repository must remain public for anonymous nightly.link downloads. The optional nightly.link GitHub App only gives the repository its own API allowance; it is not required to upload artifacts.
 
