@@ -2,6 +2,7 @@
 
 [![CPE build](https://github.com/nuttyinc578/CPE-OPEN-source/actions/workflows/build.yml/badge.svg)](https://github.com/nuttyinc578/CPE-OPEN-source/actions/workflows/build.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CPE download](https://github.com/nuttyinc578/CPE-OPEN-source/releases)
 
 CPE is the open-source physics and particle engine used by The Cube Beta. Python, Pymunk, and Pygame provide the simulation and rendering. A Node.js bridge accepts typed commands, a Go service caches the latest state, Java can submit commands, and .NET Aspire can launch the complete stack.
 
