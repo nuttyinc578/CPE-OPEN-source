@@ -95,5 +95,3 @@ Run the Go command from `cpe\go-cache`.
 
 CPE source code is released under the [MIT License](LICENSE). Third-party packages keep their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
 
-## special thanks
-@codex
