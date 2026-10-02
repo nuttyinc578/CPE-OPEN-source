@@ -3,6 +3,7 @@ name: CPE open-source build
 on:
   push:
     branches: [main]
+    tags: ["0.2"]
   pull_request:
   workflow_dispatch:
 
@@ -14,6 +15,8 @@ jobs:
     name: Build and test CPE for Windows
     runs-on: windows-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
 
     steps:
       - name: Check out source
@@ -112,6 +115,21 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 6
+
+      - name: Package tagged release
+        if: github.ref == 'refs/tags/0.2'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path release/CPE-Windows/* -DestinationPath release/CPE-0.2-Windows.zip -CompressionLevel Optimal
+          $hash = (Get-FileHash release/CPE-0.2-Windows.zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  CPE-0.2-Windows.zip" | Set-Content release/SHA256SUMS.txt -Encoding ascii
+
+      - name: Publish CPE 0.2 release
+        if: github.ref == 'refs/tags/0.2'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create 0.2 release/CPE-0.2-Windows.zip release/SHA256SUMS.txt --verify-tag --title "Cube Physics Engine 0.2" --notes-file RELEASE_NOTES_0.2.md
 
       - name: Add nightly.link URL to summary
         shell: pwsh

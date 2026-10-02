@@ -11,10 +11,12 @@ from typing import Any
 from .client import BridgeClient, BridgeError
 from .engine import CubePhysicsEngine
 from .protocol import compile_command
+from . import __version__
 
 
 def _arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Cube Physics Engine with Integrated Particle Engine")
+    parser.add_argument("--version", action="version", version=f"CPE {__version__}")
     parser.add_argument("--aspire-ip", default=os.environ.get("CPE_ASPIRE_IP", "127.0.0.1"))
     parser.add_argument("--node-port", type=int, default=int(os.environ.get("CPE_NODE_PORT", "4310")))
     parser.add_argument("--bridge-url", default=os.environ.get("CPE_BRIDGE_URL"))

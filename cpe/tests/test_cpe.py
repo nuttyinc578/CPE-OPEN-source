@@ -66,6 +66,14 @@ class ParticleAndPhysicsTests(unittest.TestCase):
         engine.execute_line("CPE/1 4 30")
         self.assertEqual(engine.snapshot()["bodies"], [])
 
+    def test_health_report_describes_both_engines(self):
+        engine = CubePhysicsEngine(width=320, height=240)
+        report = engine.health_report()
+        self.assertTrue(report["physics_online"])
+        self.assertTrue(report["particles_online"])
+        self.assertEqual(report["quality"], "enhanced")
+        self.assertEqual(report["fixed_step_hz"], 120)
+
 
     def test_pygame_renderer_draws_physics_and_ipe(self):
         import pygame

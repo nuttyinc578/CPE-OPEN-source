@@ -261,6 +261,20 @@ class CubePhysicsEngine:
             ],
         }
 
+    def health_report(self) -> dict[str, Any]:
+        """Return a compact health report for games, repair tools, and bridges."""
+        snapshot = self.snapshot()
+        return {
+            "engine": snapshot["engine"],
+            "protocol": snapshot["protocol"],
+            "physics_online": self.space is not None,
+            "particles_online": self.particles is not None,
+            "body_count": len(snapshot["bodies"]),
+            "particle_count": snapshot["particle_count"],
+            "fixed_step_hz": round(1 / self._fixed_step),
+            "quality": "enhanced",
+        }
+
     def render(self, surface: Any, *, clear: bool = True) -> None:
         import pygame
 

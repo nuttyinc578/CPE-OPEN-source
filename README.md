@@ -11,9 +11,11 @@ The Integrated Particle Engine (IPE) is included in CPE.
 
 After the first successful `main` build, this permanent nightly.link URL downloads the newest `CPE-Windows` artifact:
 
-[![Download CPE 0.1 for Windows](https://img.shields.io/badge/Download-CPE%200.1%20for%20Windows-2ea44f?style=for-the-badge&logo=windows11&logoColor=white)](https://nightly.link/nuttyinc578/CPE-OPEN-source/workflows/build/main/CPE-Windows.zip)
+[![Download CPE 0.2 for Windows](https://img.shields.io/badge/Download-CPE%200.2%20for%20Windows-2ea44f?style=for-the-badge&logo=windows11&logoColor=white)](https://nightly.link/nuttyinc578/CPE-OPEN-source/workflows/build/main/CPE-Windows.zip)
 
-[Read the CPE 0.1 release notes](https://github.com/nuttyinc578/CPE-OPEN-source/releases/tag/0.1)
+[Read the CPE 0.2 release](https://github.com/nuttyinc578/CPE-OPEN-source/releases/tag/0.2)
+
+CPE 0.2 normalizes every package to version `0.2.0`, adds an engine/IPE health report for repair tooling, publishes a tagged Windows ZIP with checksums, and adds a professional documentation site.
 
 The repository must remain public for anonymous nightly.link downloads. The optional nightly.link GitHub App only gives the repository its own API allowance; it is not required to upload artifacts.
 
